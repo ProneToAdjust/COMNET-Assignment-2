@@ -103,7 +103,7 @@ def server_thread(client_socket):
             client_socket.send(b'502 Command not implemented\r\n')
 
 # Define the server's host and port
-HOST = 'localhost'
+HOST = socket.gethostbyname(socket.gethostname())
 PORT = 1006
 
 # Create a socket object
