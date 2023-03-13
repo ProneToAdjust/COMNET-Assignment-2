@@ -1,7 +1,8 @@
 import sys
 import socket
 
-class FilezillaClient():
+class FtpClient():
+
     def __init__(self, host_ip, port, username, password):
         self.host_ip = host_ip
         self.port = port
@@ -22,12 +23,6 @@ class FilezillaClient():
         response = self.ftp_socket.recv(1024).decode()
         print(response)
 
-        # Change to the desired directory
-        self.ftp_socket.send("CWD /Server/\r\n".encode())
-        response = self.ftp_socket.recv(1024).decode()
-        print(response)
-
-
     def list_files(self):
         self.ftp_socket.send(f"PASV\r\n".encode())
         response = self.ftp_socket.recv(1024).decode()
@@ -36,9 +31,11 @@ class FilezillaClient():
         data_port_start = response.find("(") + 1
         data_port_end = response.find(")")
         data_port = response[data_port_start:data_port_end].split(",")
+        data_ip = f'{data_port[0]}.{data_port[1]}.{data_port[2]}.{data_port[3]}'
+        print(data_ip)
         data_port = int(data_port[-2]) * 256 + int(data_port[-1])
         data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data_socket.connect((self.host_ip, data_port))
+        data_socket.connect((data_ip, data_port))
 
         self.ftp_socket.send("LIST\r\n".encode())
         response = self.ftp_socket.recv(1024).decode()
@@ -71,7 +68,7 @@ if __name__ == '__main__':
     username = input("USERNAME:")
     password = input("PASSWORD:")
 
-    client = FilezillaClient(host_ip, port, username, password)
+    client = FtpClient(host_ip, port, username, password)
 
     while True:
         command = input("Enter command:")
