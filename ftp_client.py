@@ -47,6 +47,9 @@ class FtpClient():
             print(data.decode(), end='')
             data = data_socket.recv(1024)
 
+        response = self.ftp_socket.recv(1024).decode()
+        print(response)
+
     def upload_file(self):
         pass
 
@@ -60,18 +63,24 @@ class FtpClient():
         pass
 
     def quit(self):
-        pass
+        self.ftp_socket.send(b"QUIT\r\n")
+        response = self.ftp_socket.recv(1024).decode()
+        print(response)
 
 if __name__ == '__main__':
-    host_ip = input("HOST:")
-    port = int(input("PORT:"))
-    username = input("USERNAME:")
-    password = input("PASSWORD:")
-
-    client = FtpClient(host_ip, port, username, password)
-
     while True:
-        command = input("Enter command:")
+        host_ip = input("HOST:")
+        port = int(input("PORT:"))
+        username = input("USERNAME:")
+        password = input("PASSWORD:")
 
-        if command == "LIST":
-            client.list_files()
+        client = FtpClient(host_ip, port, username, password)
+
+        while True:
+            command = input("Enter command:")
+
+            if command == "LIST":
+                client.list_files()
+            elif command == "QUIT":
+                client.quit()
+                break
