@@ -99,6 +99,18 @@ def server_thread(client_socket):
 
             client_socket.send(b'226 Transfer complete\r\n')
 
+        # Download file
+        elif command == 'DWLD':
+            client_socket.send(b'502 Command not implemented\r\n')
+            
+        # Delete file     
+        elif command == 'DELF':
+            client_socket.send(b'502 Command not implemented\r\n')
+            
+        # Rename file
+        elif command == 'RNTO':
+            client_socket.send(b'502 Command not implemented\r\n')
+
         else:
             client_socket.send(b'502 Command not implemented\r\n')
 
