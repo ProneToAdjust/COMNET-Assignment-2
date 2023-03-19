@@ -45,6 +45,8 @@ def server_thread(client_socket):
         elif command == 'TYPE':
             if args == 'I':
                 client_socket.send(b'200 Type set to I\r\n')
+            elif args == 'A':
+                client_socket.send(b'200 Type set to A\r\n')
 
         elif command == 'PASV':
             data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -96,6 +98,7 @@ def server_thread(client_socket):
 
             uploaded_file.write(file_bytes)
             uploaded_file.close()
+            data_socket.close()
 
             client_socket.send(b'226 Transfer complete\r\n')
 
