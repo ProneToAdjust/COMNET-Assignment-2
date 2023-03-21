@@ -85,27 +85,8 @@ class FtpClient():
     def delete_file(self, file_name):
         self.ftp_socket.send(f"PASV\r\n".encode())
         response = self.ftp_socket.recv(1024).decode()
-        print(response)
-
-        data_port_start = response.find("(") + 1
-        data_port_end = response.find(")")
-        data_port = response[data_port_start:data_port_end].split(",")
-        data_ip = f'{data_port[0]}.{data_port[1]}.{data_port[2]}.{data_port[3]}'
-        print(data_ip)
-        data_port = int(data_port[-2]) * 256 + int(data_port[-1])
-        data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data_socket.connect((data_ip, data_port))
-
+        #print(response)
         self.ftp_socket.send(f"DELE {file_name}\r\n".encode())
-        response = self.ftp_socket.recv(1024).decode()
-        print(response)
-        
-        # Receive the directory listing
-        data = data_socket.recv(1024)
-        while data:
-            print(data.decode(), end='')
-            data = data_socket.recv(1024)
-
         response = self.ftp_socket.recv(1024).decode()
         print(response)
 
@@ -141,7 +122,7 @@ if __name__ == '__main__':
             elif command == "QUIT":
                 client.quit()
                 break
-            elif command == "DELE":
+            elif command == "DELF":
                 client.delete_file(arg)
             elif command == 'UPLD':
                 client.upload_file(arg)

@@ -108,12 +108,11 @@ def server_thread(client_socket):
             
         # Delete file     
         elif command == 'DELE':
-            print(args)
             try:
                 os.remove(args)
-                client_socket.send(b"250 File deleted\r\n")
+                client_socket.send(b'250 File deleted\r\n')
             except:
-                client_socket.send(b"550 Failed to delete file\r\n")
+                client_socket.send(b'550 Failed to delete file\r\n')
             
         # Rename file
         elif command == 'RNTO':
