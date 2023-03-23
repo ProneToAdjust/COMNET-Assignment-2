@@ -103,9 +103,27 @@ def server_thread(client_socket):
             client_socket.send(b'226 Transfer complete\r\n')
 
         # Download file
-        elif command == 'DWLD':
-            client_socket.send(b'502 Command not implemented\r\n')
-            
+        elif command == 'DWLD' or command == 'RETR':
+            try:
+                downloaded_file = open(args, 'rb')
+
+                client_socket.send(b'150 File status okay; about to open data connection\r\n')
+
+                data_client_socket, data_client_address = data_socket.accept()
+                
+                data = downloaded_file.read(1024)
+                while data:
+                    data_client_socket.send(data)
+                    data = downloaded_file.read(1024)
+
+                downloaded_file.close()
+                data_client_socket.close()
+                data_socket.close()
+
+                client_socket.send(b'226 Closing data connection, file transfer successful\r\n')
+            except:
+                client_socket.send(b'502 Download failed\r\n')
+        
         # Delete file     
         elif command == 'DELE':
             try:
