@@ -3,23 +3,13 @@ import socket
 
 class FtpClient():
 
-    def __init__(self, host_ip, port, username, password):
+    def __init__(self, host_ip, port):
         self.host_ip = host_ip
         self.port = port
-        self.username = username
-        self.password = password
 
         # Connect to the FTP server
         self.ftp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ftp_socket.connect((self.host_ip, self.port))
-        response = self.ftp_socket.recv(1024).decode()
-        print(response)
-
-        # Send the login information
-        self.ftp_socket.send(f"USER {self.username}\r\n".encode())
-        response = self.ftp_socket.recv(1024).decode()
-        print(response)
-        self.ftp_socket.send(f"PASS {self.password}\r\n".encode())
         response = self.ftp_socket.recv(1024).decode()
         print(response)
 
@@ -135,12 +125,21 @@ if __name__ == '__main__':
     while True:
         host_ip = input("HOST:")
         port = int(input("PORT:"))
-        username = input("USERNAME:")
-        password = input("PASSWORD:")
 
-        client = FtpClient(host_ip, port, username, password)
+        client = FtpClient(host_ip, port)
 
         while True:
+            print(
+"""
+Commands:                     Usage:
+LIST                          List files in the file directory
+UPLD <file_name>              Upload file into the file directory
+DWLD <file_name>              Download file
+DELF <file_name>              Delete file
+RNTO <file_name> <new_name>   Rename file
+QUIT                          Exit
+"""
+                )
             input_command = input("Enter command:")
             input_command = input_command.split(' ')
 
