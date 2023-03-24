@@ -33,7 +33,7 @@ def server_thread(client_socket):
             # client_socket.send(b'200 Switching to Binary mode\r\n')
 
         elif command == 'PWD':
-            client_socket.send(f'257 {os.getcwd()}\r\n'.encode())
+            client_socket.send(f'257 {repr(os.getcwd())}\r\n'.encode())
 
         elif command == 'CWD':
             try:
