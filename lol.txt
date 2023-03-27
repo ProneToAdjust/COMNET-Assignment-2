@@ -1,9 +1,0 @@
-CREATE TABLE setting(
-    settingID INT,
-    userID INT,
-    textLanguage VARCHAR(255),
-    favWithdraw DOUBLE,
-    favTransfer BLOB,
-    PRIMARY KEY(settingID),
-    FOREIGN KEY(userID) REFERENCES USER(userID)
-);
