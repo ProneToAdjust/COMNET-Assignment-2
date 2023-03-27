@@ -147,7 +147,7 @@ def server_thread(client_socket):
             
 
 # Define the server's host and port
-HOST = socket.gethostbyname(socket.gethostname())
+HOST = ''
 PORT = 1006
 
 # Create a socket object
@@ -159,7 +159,9 @@ server_socket.bind((HOST, PORT))
 # Listen for incoming connections
 server_socket.listen(1)
 
-print(f'Server listening on {HOST}:{PORT}')
+print(f'Server listening on \nhost: {socket.gethostbyname(socket.gethostname())}\nport: {PORT}')
+print("If you are connecting on the same machine, you can connect to localhost or 127.0.0.1 in the client")
+print("Do try connecting on the Filezilla client")
 
 while True:
     # Wait for a client to connect
