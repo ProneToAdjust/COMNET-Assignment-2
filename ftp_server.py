@@ -144,7 +144,9 @@ def server_thread(client_socket):
             except FileExistsError:
                 print("File name already exists, no duplicates allowed")
                 client_socket.send(b'550 Failed to rename file, File name already exists, no duplicates allowed\r\n')
-            
+
+        else:
+            client_socket.send(b'502 Command not implemented\r\n')
 
 # Define the server's host and port
 HOST = ''
