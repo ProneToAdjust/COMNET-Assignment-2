@@ -71,11 +71,8 @@ class FtpClient():
 
         data = data_socket.recv(1024)
         while data:
-            print(data)
             file_bytes += data
             data = data_socket.recv(1024)
-            print("LOOPING")
-        print(file_bytes)
         file_to_download.write(file_bytes)
 
         file_to_download.close()
@@ -87,7 +84,6 @@ class FtpClient():
     def delete_file(self, file_name):
         self.ftp_socket.send(f"PASV\r\n".encode())
         response = self.ftp_socket.recv(1024).decode()
-        #print(response)
         self.ftp_socket.send(f"DELE {file_name}\r\n".encode())
         response = self.ftp_socket.recv(1024).decode()
         print(response)
