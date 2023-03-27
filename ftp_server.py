@@ -134,10 +134,17 @@ def server_thread(client_socket):
             
         # Rename file
         elif command == 'RNTO':
-            client_socket.send(b'502 Command not implemented\r\n')
-
-        else:
-            client_socket.send(b'502 Command not implemented\r\n')
+            try:
+                args_split = args.split("'")
+                os.rename(args_split[1], args_split[3])
+                client_socket.send(b'250 File renamed\r\n')
+            except FileNotFoundError:
+                print("File not found")
+                client_socket.send(b'550 Failed to rename file, File not found\r\n')
+            except FileExistsError:
+                print("File name already exists, no duplicates allowed")
+                client_socket.send(b'550 Failed to rename file, File name already exists, no duplicates allowed\r\n')
+            
 
 # Define the server's host and port
 HOST = socket.gethostbyname(socket.gethostname())

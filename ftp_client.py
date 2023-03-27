@@ -113,8 +113,13 @@ class FtpClient():
         print(response)
 
 
-    def rename_file(self):
-        pass
+    def rename_file(self, old_file_name, new_file_name):
+        self.ftp_socket.send(f"PASV\r\n".encode())
+        response = self.ftp_socket.recv(1024).decode()
+        print(response)
+        self.ftp_socket.send(f"RNTO {old_file_name, new_file_name}\r\n".encode())
+        response = self.ftp_socket.recv(1024).decode()
+        print(response)        
 
     def quit(self):
         self.ftp_socket.send(b"QUIT\r\n")
@@ -147,6 +152,10 @@ QUIT                          Exit
 
             if len(input_command) > 1:
                 arg = input_command[1]
+                
+            if len(input_command) == 3:
+                arg1 = input_command[1]
+                arg2 = input_command[2]
 
             if command == "LIST":
                 client.list_files()
@@ -159,3 +168,5 @@ QUIT                          Exit
                 client.upload_file(arg)
             elif command == 'DWLD':
                 client.download_file(arg)
+            elif command == 'RNTO':
+                client.rename_file(arg1, arg2)
