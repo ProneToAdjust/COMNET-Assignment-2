@@ -1,4 +1,3 @@
-import sys
 import socket
 
 class FtpClient():
@@ -18,14 +17,7 @@ class FtpClient():
         response = self.ftp_socket.recv(1024).decode()
         print(response)
 
-        data_port_start = response.find("(") + 1
-        data_port_end = response.find(")")
-        data_port = response[data_port_start:data_port_end].split(",")
-        data_ip = f'{data_port[0]}.{data_port[1]}.{data_port[2]}.{data_port[3]}'
-        print(data_ip)
-        data_port = int(data_port[-2]) * 256 + int(data_port[-1])
-        data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data_socket.connect((data_ip, data_port))
+        data_socket = self.make_data_socket(response)
 
         self.ftp_socket.send("LIST\r\n".encode())
         response = self.ftp_socket.recv(1024).decode()
@@ -47,13 +39,7 @@ class FtpClient():
         response = self.ftp_socket.recv(1024).decode()
         print(response)
 
-        data_port_start = response.find("(") + 1
-        data_port_end = response.find(")")
-        data_port = response[data_port_start:data_port_end].split(",")
-        data_ip = f'{data_port[0]}.{data_port[1]}.{data_port[2]}.{data_port[3]}'
-        data_port = int(data_port[-2]) * 256 + int(data_port[-1])
-        data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data_socket.connect((data_ip, data_port))
+        data_socket = self.make_data_socket(response)
 
         self.ftp_socket.send(f"UPLD {file_name}\r\n".encode())
         file_to_upload = open(file_name, 'rb')
@@ -74,13 +60,7 @@ class FtpClient():
         response = self.ftp_socket.recv(1024).decode()
         print(response)
 
-        data_port_start = response.find("(") + 1
-        data_port_end = response.find(")")
-        data_port = response[data_port_start:data_port_end].split(",")
-        data_ip = f'{data_port[0]}.{data_port[1]}.{data_port[2]}.{data_port[3]}'
-        data_port = int(data_port[-2]) * 256 + int(data_port[-1])
-        data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data_socket.connect((data_ip, data_port))
+        data_socket = self.make_data_socket(response)
 
         self.ftp_socket.send(f"DWLD {file_name}\r\n".encode())
         response = self.ftp_socket.recv(1024).decode()
@@ -125,6 +105,19 @@ class FtpClient():
         self.ftp_socket.send(b"QUIT\r\n")
         response = self.ftp_socket.recv(1024).decode()
         print(response)
+
+    # takes the respose from the PASV command and extracts the ip and port, 
+    # afterwards returns a connected socket for data transfer
+    def make_data_socket(self, response):
+        data_port_start = response.find("(") + 1
+        data_port_end = response.find(")")
+        data_port = response[data_port_start:data_port_end].split(",")
+        data_ip = f'{data_port[0]}.{data_port[1]}.{data_port[2]}.{data_port[3]}'
+        data_port = int(data_port[-2]) * 256 + int(data_port[-1])
+        data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        data_socket.connect((data_ip, data_port))
+
+        return data_socket
 
 if __name__ == '__main__':
     while True:
