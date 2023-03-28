@@ -2,6 +2,7 @@ import socket
 import os
 from threading import Thread
 
+
 def server_thread(client_socket):
     # Send a welcome message to the client
     client_socket.send(b'220 Welcome to the FTP server\r\n')
@@ -38,7 +39,8 @@ def server_thread(client_socket):
         elif command == 'CWD':
             try:
                 os.chdir(args)
-                client_socket.send(f'250 Directory changed to {os.getcwd()}\r\n'.encode())
+                client_socket.send(
+                    f'250 Directory changed to {os.getcwd()}\r\n'.encode())
             except:
                 client_socket.send(b'550 Failed to change directory\r\n')
 
@@ -55,16 +57,18 @@ def server_thread(client_socket):
             data_port = data_socket.getsockname()[1]
             data_ip = socket.gethostbyname(socket.gethostname())
             data_address = (data_ip, data_port)
-            client_socket.send(f'227 Entering Passive Mode ({",".join(data_ip.split("."))},{data_port//256},{data_port%256})\r\n'.encode())
+            client_socket.send(
+                f'227 Entering Passive Mode ({",".join(data_ip.split("."))},{data_port//256},{data_port%256})\r\n'.encode())
             data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             data_socket.bind(data_address)
-            data_socket.listen(1) 
+            data_socket.listen(1)
 
         elif command == 'LIST':
             try:
                 file_list = os.listdir()
                 file_str = '\r\n'.join(file_list) + '\r\n'
-                client_socket.send(f'150 Opening data connection for LIST\r\n'.encode())
+                client_socket.send(
+                    f'150 Opening data connection for LIST\r\n'.encode())
 
                 # Wait for the client to connect to the data port
                 data_client_socket, data_client_address = data_socket.accept()
@@ -107,10 +111,11 @@ def server_thread(client_socket):
             try:
                 downloaded_file = open(args, 'rb')
 
-                client_socket.send(b'150 File status okay; about to open data connection\r\n')
+                client_socket.send(
+                    b'150 File status okay; about to open data connection\r\n')
 
                 data_client_socket, data_client_address = data_socket.accept()
-                
+
                 data = downloaded_file.read(1024)
                 while data:
                     data_client_socket.send(data)
@@ -120,33 +125,52 @@ def server_thread(client_socket):
                 data_client_socket.close()
                 data_socket.close()
 
-                client_socket.send(b'226 Closing data connection, file transfer successful\r\n')
+                client_socket.send(
+                    b'226 Closing data connection, file transfer successful\r\n')
             except:
                 client_socket.send(b'502 Download failed\r\n')
-        
-        # Delete file     
+
+        # Delete file
         elif command == 'DELE':
             try:
                 os.remove(args)
                 client_socket.send(b'250 File deleted\r\n')
             except:
                 client_socket.send(b'550 Failed to delete file\r\n')
-            
+
         # Rename file
         elif command == 'RNTO':
             try:
                 args_split = args.split("'")
-                os.rename(args_split[1], args_split[3])
-                client_socket.send(b'250 File renamed\r\n')
+
+                if (len(args_split) <= 1):
+                    os.rename("placeholder", args_split[0])
+                    client_socket.send(b'250 File renamed\r\n')
+                else:
+                    os.rename(args_split[1], args_split[3])
+                    client_socket.send(b'250 File renamed\r\n')
             except FileNotFoundError:
                 print("File not found")
-                client_socket.send(b'550 Failed to rename file, File not found\r\n')
+                client_socket.send(
+                    b'550 Failed to rename file, File not found\r\n')
             except FileExistsError:
                 print("File name already exists, no duplicates allowed")
-                client_socket.send(b'550 Failed to rename file, File name already exists, no duplicates allowed\r\n')
+                client_socket.send(
+                    b'550 Failed to rename file, File name already exists, no duplicates allowed\r\n')
+
+        # Rename file for Filezilla, will call RNTO after this is executed
+        elif command == 'RNFR':
+            try:
+                currentName = args.replace("'", "")
+                os.rename(currentName, 'placeholder')
+
+                client_socket.send(b'250 File renamed\r\n')
+            except:
+                client_socket.send(b'550 Failed to rename file\r\n')
 
         else:
             client_socket.send(b'502 Command not implemented\r\n')
+
 
 # Define the server's host and port
 HOST = ''
@@ -161,7 +185,8 @@ server_socket.bind((HOST, PORT))
 # Listen for incoming connections
 server_socket.listen(1)
 
-print(f'Server listening on \nhost: {socket.gethostbyname(socket.gethostname())}\nport: {PORT}')
+print(
+    f'Server listening on \nhost: {socket.gethostbyname(socket.gethostname())}\nport: {PORT}')
 print("If you are connecting on the same machine, you can connect to localhost or 127.0.0.1 in the client")
 print("Do try connecting on the Filezilla client")
 
@@ -171,5 +196,5 @@ while True:
 
     print(f'Client connected from {client_address}')
 
-    thread = Thread(target= server_thread, args= (client_socket, ))
+    thread = Thread(target=server_thread, args=(client_socket, ))
     thread.start()
