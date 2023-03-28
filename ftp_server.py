@@ -1,6 +1,7 @@
 import socket
 import os
 from threading import Thread
+# Implemented usage with Filezilla client
 
 
 def server_thread(client_socket):
@@ -31,7 +32,6 @@ def server_thread(client_socket):
 
         elif command == 'PASS':
             client_socket.send(b'230 Login successful\r\n')
-            # client_socket.send(b'200 Switching to Binary mode\r\n')
 
         elif command == 'PWD':
             client_socket.send(f'257 {repr(os.getcwd())}\r\n'.encode())
